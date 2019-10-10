@@ -1,16 +1,15 @@
-#!/usr/bin/python
-# coding:utf-8
+# -*- coding: utf-8 -*-
+# @Time    : 2019/9/10 11:21
+# @Author  : bjsasc
 import json
 import logging
-# import inotify.adapters
-import DataUtil
-import sys
 import os
+import sys
 import time
-from urllib import parse, request
-
+import DataUtil
 from pyinotify import WatchManager, Notifier, ProcessEvent, IN_CLOSE_WRITE
 
+# 设置日志输出两个handle，屏幕和文件
 log = logging.getLogger('file watch ---')
 fp = logging.FileHandler('a.log', 'a+', encoding='utf-8')
 fs = logging.StreamHandler()
@@ -18,31 +17,13 @@ log.addHandler(fs)
 log.addHandler(fp)
 log.setLevel(logging.DEBUG)
 
-fileMask = IN_CLOSE_WRITE
-FILE_DIR = r'/home/bjsasc/test/'
+FILE_DIR = r'/home/bjsasc/test/' # 监听文件目录
 
 
-def notice(url, filename):
-    data = {'filename': filename}
-    post_data = parse.urlencode(data).encode()
-    rest = request.Request(url, data=post_data)
-    resp = request.urlopen(rest)
-    log.info(resp.read())
-
-
-class EventHandler(ProcessEvent):
-    """事件处理"""
-
-    def process_IN_CLOSE_WRITE(self, event):
-        # logging.info("create file: %s " % os.path.join(event.path, event.name))
-        file_path = os.path.join(event.path, event.name)
-        time.sleep(2)
-        # notice("http://www.baidu.com",event.name)
-        log.info('write file finished ...%s' % (file_path))
-        read_json_form_file(file_path)
-
-
-def check_dir():
+def check_dir_exist():
+    """
+        检查文件目录是否存在
+    """
     if not FILE_DIR:
         log.info("The WATCH_PATH setting MUST be set.")
         sys.exit()
@@ -54,24 +35,24 @@ def check_dir():
             sys.exit()
 
 
-def main():
-    check_dir()
-    wm = WatchManager()
-    notifier = Notifier(wm, EventHandler())
-    wm.add_watch(FILE_DIR, fileMask, rec=True, auto_add=True)
-    log.info('Now starting monitor %s' % (FILE_DIR))
-    notifier.loop()
-
-
-def read_json_form_file(file_path):
+def read_json_from_file(file_path):
+    """
+    从文件中读取json数据
+    :param file_path:
+    """
     with open(file_path) as f:
         s = f.read()
         result = json.loads(s)
+    # 处理数据
     for i in result:
         data_process(i)
 
 
 def data_process(data: dict):
+    """
+    处理从json中的数据
+    :param data:
+    """
     file_path = data["file_path"]
     # 从文件名称获取文件信息
     name_info = DataUtil.parse_name(file_path)
@@ -94,7 +75,33 @@ def data_process(data: dict):
     # 更新数据
     DataUtil.update_date()
     # 调用远程接口
-    notice()
+    DataUtil.notice(file_path)
+
+
+class EventHandler(ProcessEvent):
+
+    def process_IN_CLOSE_WRITE(self, event):
+        """
+        监听文件传输完成时间，只实现了传输完成监听
+        :param event:
+        """
+        # logging.info("create file: %s " % os.path.join(event.path, event.name))
+        file_path = os.path.join(event.path, event.name)
+        time.sleep(2)
+        log.info('write file finished ...%s' % (file_path))
+        read_json_from_file(file_path)
+
+
+def main():
+    """
+    文件监听的入口程序
+    """
+    check_dir_exist()
+    wm = WatchManager()
+    notifier = Notifier(wm, EventHandler())
+    wm.add_watch(FILE_DIR, IN_CLOSE_WRITE, rec=True, auto_add=True)
+    log.info('Now starting monitor %s' % (FILE_DIR))
+    notifier.loop()
 
 
 if __name__ == '__main__':

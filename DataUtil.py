@@ -1,13 +1,18 @@
-# -*- coding:utf-8 -*-
+# -*- coding: utf-8 -*-
+# @Time    : 2019/10/10 15:28
+# @Author  : bjsasc
 import os
 import subprocess
 import time
-
-import pymysql
+from urllib import  parse,request
 from DBClient import DBClient
 
-def save_data(m: dict):
 
+def save_data(m: dict):
+    """
+    保存文件到数据库，
+    :rtype: object
+    """
     sql = """INSERT INTO `g_divcoverdata` (`type`, `name`, `suffix`, `sourcepath`, `checknum`, `status`, `dtime`)\
             VALUES ( {type}, {name}, {suffix}, {sourcepath},  {checknum}, {status}, {datetime}""" \
         .format(m['type'], m[''], m['suffix'], m['sourcepath'], m['checknum'], m['status'],
@@ -17,6 +22,9 @@ def save_data(m: dict):
 
 
 def update_data():
+    """
+    更新数据库文件，估计要传个id值过来，
+    """
     # 打开数据库连接（请根据自己的用户名、密码及数据库名称进行修改）
     sql = "select 1"
     with DBClient() as db:
@@ -25,33 +33,9 @@ def update_data():
 
 def get_data():
     sql = "select * from g_divcoverdata"
-    cnn = pymysql.connector.connect(host = "127.0.0.1",user='root', passwd='root', database='testdb')
-    try:
-        cursor = cnn.cursor()
-        cursor.execute(sql)
-        field_list = []
-        for field in cursor.description:
-            field_list.append(field[0])
-        results = cursor.fetchall()
-        list = []
-        for row in results:
-            dict_row = {}
-            i = 0
-            while i < len(field_list):
-                # print(field_list[i], type(row[i]), str(row[i]))
-                if type(row[i]) == bytes:
-                    dict_row[field_list[i]] = bytes.decode(row[i])
-                else:
-                    dict_row[field_list[i]] = row[i]
-                i += 1
-            list.append(dict_row)
-        cursor.close()
-        return list
-    except Exception as e:
-        print("数据库操作失败", e)
-    finally:
-        # 关闭数据库连接
-        cnn.close()
+    with DBClient() as db:
+        db.execute(sql)
+        return db.fetchall()
 
 
 def parse_name(filepath: str):
@@ -59,15 +43,15 @@ def parse_name(filepath: str):
     根据文件路径，返回文件有效信息，
     :rtype: list，文件相关信息
     """
-    filename = filepath.rsplit("/")[1]
+    filename = filepath.rsplit("/", 1)[1]
     name_info = filename.split("_")
     return name_info
 
 
 def check_file(file_path):
     """
-    用来检查文件，但是不知道具体干啥用的
-    :rtype: object
+    用来检查文件
+    :rtype: int
     """
     try:
         # print(filePath)
@@ -86,6 +70,7 @@ def check_file(file_path):
     return 0
 
 
+# 远程用scp复制文件，还未测试
 def copy_file(from_path, to_path):
     user = "",
     ip = ""
@@ -106,3 +91,16 @@ def copy_file(from_path, to_path):
     p = subprocess.Popen(SCP_CMD, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     p.communicate()
     os.system(SCP_CMD)
+
+
+def notice(filename):
+    """
+        远程调用接口，暂时支持传入地址和文件名称作为参数
+    :param url:
+    :param filename:
+    """
+    url = "http:/111.com"
+    data = {'filename': filename}
+    post_data = parse.urlencode(data).encode()
+    rest = request.Request(url, data=post_data)
+    resp = request.urlopen(rest)

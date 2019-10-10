@@ -1,0 +1,24 @@
+说明：
+	数据发现模块用python实现，单独部署。
+	监控指定文件下文件变化，传输程序会将已经传输完成的数据组织成json形式形成特定扩展名文件传输，所以仅需要监控此种扩展名文件
+	业务过程如下：
+	1）程序监控指定目录下的指定扩展名（例如：.fin）文件传输完成
+	2）读取新文件内容(json），遍历已经传输完成的文件。
+	{
+		3）解析文件名称（例如：GECAM-01_GRD_0D_EVT_BTIME_20190926T092412_011.fits）获取有效信息，卫星代号：GECAM－01，载荷：GRD
+		4）打开一次文件，成功返回1，失败返回0，对应下面sql中的checknum值
+		4）保存数据库 INSERT INTO `gns`.`g_divcoverdata` (`type`, `name`, `suffix`, `sourcepath`, `checknum`, `status`, `dtime`) VALUES ( '1', 'GECAM-01_GRD_0D_EVT_BTIME_20190926T092412_011.fits', 'fits', 'D:\\filework\\source\\GECAM-01_GRD_0D_EVT_BTIME_20190926T092412_011.fits',  '0', '1', '2019-09-26 16:11:36');
+		5）归档数据，执行scp命令将数据COPY到远程服务器的指定文件夹下
+		6）更新些条数据信息，update g_divcoverdata set archivepath='归档地址' status=2 where id=12;
+		7）调用远程服务接口，参数，（数据归档地址）暂定
+
+	}
+	注意：各步骤的异常信息也需要记录数据库
+	枚举值：
+	STATUS_1(1, "发现数据"),
+	STATUS_2(2, "归档完成"),
+	STATUS_3(3, "等待启动"),
+	STATUS_4(4, "启动完成"),
+	STATUS_5(5, "校验失败"),
+	STATUS_6(6, "归档失败"),
+	STATUS_7(7, "启动失败");

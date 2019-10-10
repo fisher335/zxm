@@ -95,7 +95,7 @@ def copy_file(from_path, to_path):
 
 def notice(filename):
     """
-        远程调用接口，暂时支持传入地址和文件名称作为参数
+        远程调用接口，暂时支持传入文件名称作为参数
     :param url:
     :param filename:
     """

@@ -3,7 +3,7 @@
 from DBClient import DBClient
 
 with DBClient() as db:
-    db.execute("select * from account")
+    db.execute('''select * from account''')
     print(db.fetchall())
 
 

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-# @Time    : 2019/10/10 15:28
+# @Time    : 2019/10/10 11:28
 # @Author  : bjsasc
 import os
 import subprocess
 import time
-from urllib import  parse,request
+from urllib import parse, request
 from DBClient import DBClient
 
 
@@ -13,8 +13,8 @@ def save_data(m: dict):
     保存文件到数据库，
     :rtype: object
     """
-    sql = """INSERT INTO `g_divcoverdata` (`type`, `name`, `suffix`, `sourcepath`, `checknum`, `status`, `dtime`)\
-            VALUES ( {type}, {name}, {suffix}, {sourcepath},  {checknum}, {status}, {datetime}""" \
+    sql = "INSERT INTO `g_divcoverdata` (`type`, `name`, `suffix`, `sourcepath`, `checknum`, `status`, `dtime`)\
+            VALUES ( {type}, {name}, {suffix}, {sourcepath},  {checknum}, {status}, {datetime}"\
         .format(m['type'], m[''], m['suffix'], m['sourcepath'], m['checknum'], m['status'],
                 time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
     with DBClient() as db:
@@ -70,8 +70,12 @@ def check_file(file_path):
     return 0
 
 
-# 远程用scp复制文件，还未测试
 def copy_file(from_path, to_path):
+    """
+     远程用scp复制文件，还未测试
+    :param from_path:
+    :param to_path:
+    """
     user = "",
     ip = ""
     password = ""

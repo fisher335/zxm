@@ -50,7 +50,7 @@ def read_json_from_file(file_path):
 
 def data_process(data: dict):
     """
-    处理从json中的数据
+    处理从json中读取到的数据
     :param data:
     """
     file_path = data["file_path"]

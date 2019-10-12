@@ -56,7 +56,7 @@ def data_process(data: dict):
     file_path = data["file_path"]
     # 从文件名称获取文件信息
     name_info = DataUtil.parse_name(file_path)
-    weixin_info = name_info[0]
+    weixing_info = name_info[0]
     zaihe_info = name_info[1]
     # 打开文件检查
     checknum = DataUtil.check_file(file_path)

@@ -10,8 +10,7 @@ from DBClient import DBClient
 
 def save_data(m: dict):
     """
-    保存文件到数据库，
-    :rtype: object
+    保存数据到数据库，
     """
     sql = "INSERT INTO `g_divcoverdata` (`type`, `name`, `suffix`, `sourcepath`, `checknum`, `status`, `dtime`)\
             VALUES ( {type}, {name}, {suffix}, {sourcepath},  {checknum}, {status}, {datetime}"\

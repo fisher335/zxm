@@ -3,6 +3,7 @@
 # @Author  : bjsasc
 import pymysql
 
+
 # 封装mysql的client，支持with用法，让代码简洁一些
 class DBClient:
     def __init__(self, host='localhost', port=3306, db='realmd', user='root', passwd='root', charset='utf8'):
@@ -11,7 +12,8 @@ class DBClient:
         # 创建游标，操作设置为字典类型
         self.cur = self.conn.cursor(cursor=pymysql.cursors.DictCursor)
         # 这个是list的游标类型
-        #self.cur = self.conn.cursor()
+        # self.cur = self.conn.cursor()
+
     def __enter__(self):
         # 返回游标
         return self.cur

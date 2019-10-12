@@ -24,7 +24,6 @@ def update_data():
     """
     更新数据库文件，估计要传个id值过来，
     """
-    # 打开数据库连接（请根据自己的用户名、密码及数据库名称进行修改）
     sql = "select 1"
     with DBClient() as db:
         db.execute(sql)

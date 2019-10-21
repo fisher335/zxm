@@ -1,12 +1,5 @@
-#coding:utf-8
+# coding:utf-8
 
-from DBClient import DBClient
+from loguru import logger as log
 
-with DBClient() as db:
-    db.execute('''select * from account''')
-    print(db.fetchall())
-    db.execute("select * from realmlist")
-    print(db.fetchall())
-
-
-print(db.connection)
+log.debug("hello java")
